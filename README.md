@@ -37,7 +37,7 @@ node_modules/@uniswap/v2-periphery/contracts/libraries/UniswapV2Library.sol
 ```
 by the file
 ```
-contracts/changed/UniswapV2Library.solx
+contracts/patched/UniswapV2Library.solx
 ```
 The extension .solx prevents compilation. The replacement has to be renamed to .sol.
 
@@ -46,7 +46,7 @@ To run tests:
 npx hardhat test
 ```
 or
-```
+```shell
 REPORT_GAS=true npx hardhat test
 ```
 to display gas costs.
