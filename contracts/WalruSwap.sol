@@ -146,15 +146,4 @@ contract WalruSwap {
         } else
         return order.amounts[1];
     }
-
-    function showBytes(offerCurve memory order) public pure returns(bytes memory) {
-        bytes memory orderBytes = abi.encodePacked(
-            order.nonce,
-            order.sellTok0,
-            order.prices,
-            order.amounts
-        );
-        return orderBytes;
-    }
-
 }
