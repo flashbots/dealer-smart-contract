@@ -1,0 +1,7 @@
+pool state
+100000, 200000
+users orders
+0, A, B, 5000, 2500
+0, B, A, 3000, 4500
+amm swaps
+solver gains

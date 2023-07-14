@@ -1,0 +1,9 @@
+pool state
+100000, 200000
+users orders
+0, true, [1.7; 1.8; 2], [50; 50]
+0, false, [0.4; 0.45; 0.5], [5; 5]
+amm swaps
+A, B, 47
+execution prices
+1.8, 0.5
