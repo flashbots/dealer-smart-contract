@@ -13,7 +13,7 @@ contract WalruSwap {
     IERC20[] tokenContracts;
 
     struct offerCurve {
-        uint256 nonce; // or round
+        uint256 nonce;
         bool sellTok0;
         uint256[3] prices;
         uint256[2] amounts;
@@ -25,10 +25,9 @@ contract WalruSwap {
         bytes32 s;
     }
 
-    struct uniV2Swap {
-        bytes routerAddress;
-        bytes[2] path;
-        uint256 sellAmount;
+    struct transaction{
+        bytes _contract;
+        bytes data;
     }
 
     constructor(address tok0, address tok1) {
@@ -40,7 +39,7 @@ contract WalruSwap {
         uint256[] memory prices,
         offerCurve[] memory orders, 
         signStruc[] memory signatures,
-        uniV2Swap[] calldata ammSwaps
+        transaction[] calldata intermediateTxs
     ) external {
         // require(sender == owner, ...);
         // To do: implement nonce logic
@@ -62,26 +61,14 @@ contract WalruSwap {
                 amounts[i]
             );
         }
-        // make amm swaps
-        // possible alternative: replace this by arbitrary intermediate transactions
-        for (uint i = 0; i < ammSwaps.length; i++) {
-            uniV2Swap calldata ammSwap = ammSwaps[i];
-            IUniswapV2Router02 uniswapRouter = IUniswapV2Router02(bytesToAddress(ammSwap.routerAddress));
-            address[] memory path = new address[](2);
-            for (uint j = 0; j < 2; j++) {
-                path[j] = bytesToAddress(ammSwap.path[j]);
-            }
 
-            // alternatively use uniswap.swapExactTokensForTokensSupportingFeeOnTransferTokens
-            // 0.3% swap fee is charged to amountIn
-            uniswapRouter.swapExactTokensForTokens(
-                ammSwap.sellAmount,
-                0,
-                path,
-                address(this),
-                block.timestamp
-            );
+        // call arbitrary intermediate transactions
+        for (uint i = 0; i < intermediateTxs.length; i++) {
+            address smartContract = bytesToAddress(intermediateTxs[i]._contract);
+            (bool success, ) = smartContract.call(intermediateTxs[i].data);
+            require(success, 'function call failed');
         }
+
         // pay users
         for (uint i = 0; i < n; i++) {
             offerCurve memory order = orders[i];

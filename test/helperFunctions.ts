@@ -2,7 +2,7 @@ import { ethers } from "hardhat";
 import Web3, { Address } from "web3";
 import { decToHex } from 'hex2dec';
 import * as fs from 'fs';
-import { agentsList, tokensDict } from "./constants";
+import { tokensDict } from "./constants";
 import { LimitOrder, SignStruc, UniV2Swap, Surplus, OfferCurve, Dict } from "./interfaces";
 
 export function signOrders(privateKeys: string[], userOrders: LimitOrder[]): SignStruc[] {

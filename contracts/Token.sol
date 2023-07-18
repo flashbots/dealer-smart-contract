@@ -9,11 +9,3 @@ contract Token is ERC20 {
         _mint(msg.sender, initialSupply);
     }
 }
-
-/*
-contract TokenB is ERC20 {
-    constructor(uint256 initialSupply) ERC20("TokenB", "BBB") {
-        _mint(msg.sender, initialSupply);
-    }
-}
-*/

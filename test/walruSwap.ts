@@ -5,7 +5,10 @@ import { Token } from "../typechain-types";
 import { MAX, tokensDict, privateKeys } from "./constants";
 import { launchToken, signCurveOrder, readAuctionResult, 
     parseAuctionResult, getManyBalances, areEqual, areEqualSq, showBalances, readBalancesFromFile } from "./helperFunctions";
+import { Transaction } from "./interfaces";
 import { assert } from 'chai';
+
+const largeBlockNumber = 1000000000000;
 
 describe("walruSwap tests", async function () { 
     for (let i = 0; i < 2; i++ ) {
@@ -45,6 +48,30 @@ describe("walruSwap tests", async function () {
                 routerAddress
             );
 
+            // form intermediate transactions
+            const intermediateTxs: Transaction[] = [];
+            for (const ammSwap of ammSwaps) {
+                const data = uniswapV2Router02.interface.encodeFunctionData(
+                    'swapExactTokensForTokens', 
+                    [
+                        ammSwap.sellAmount,
+                        0, // min amount of tokens back, can be zero
+                        ammSwap.path,
+                        walruSwapAddr, // tokens back recipient
+                        largeBlockNumber // expiration
+                    ]
+                ); 
+                const tx: Transaction = {
+                    _contract: routerAddress,
+                    data: data
+                }
+                intermediateTxs.push(tx);
+            }
+
+            // get signatures
+            const pKeys = privateKeys.slice(0, usersOrders.length);
+            const signatures = signCurveOrder(pKeys, usersOrders);                 
+
             // Uniswap v2, pool setup
             await uniswapV2Factory.createPair(addressA, addressB);
             const poolAddr = await uniswapV2Factory.getPair(addressA, addressB);
@@ -55,9 +82,13 @@ describe("walruSwap tests", async function () {
             await walruSwap.approveToken(addressA, routerAddress);
             await walruSwap.approveToken(addressB, routerAddress);
 
-            // prepare contract input
-            const pKeys = privateKeys.slice(0, usersOrders.length);
-            const signatures = signCurveOrder(pKeys, usersOrders);      
+            // get expected balances from txt spec
+            const [balancesBeforeSpecString, balancesAfterSpecString] = 
+                readBalancesFromFile('auctionBalances' + String(i) + '.txt');
+            const balancesBeforeSpec: bigint[][] = JSON.parse(balancesBeforeSpecString);
+            const balancesAfterSpec: bigint[][] = JSON.parse(balancesAfterSpecString);
+
+            // get balances before operation
             const agentsAddresses = [
                 user1.address,
                 user2.address,
@@ -66,14 +97,6 @@ describe("walruSwap tests", async function () {
                 poolAddr
             ]
             const tokAddresses = [addressA, addressB];
-
-            // get expected balances from txt spec
-            const [balancesBeforeSpecString, balancesAfterSpecString] = 
-                readBalancesFromFile('auctionBalances' + String(i) + '.txt');
-            const balancesBeforeSpec: bigint[][] = JSON.parse(balancesBeforeSpecString);
-            const balancesAfterSpec: bigint[][] = JSON.parse(balancesAfterSpecString);
-
-            // get balances before operation
             const balancesBefore = await getManyBalances(agentsAddresses, tokAddresses);
 
             // Optionally show balances
@@ -82,7 +105,7 @@ describe("walruSwap tests", async function () {
             // await showBalances(agents, agentsAddresses, tokAddresses);
 
             await walruSwap.connect(user0).executeRound(
-                prices, usersOrders, signatures, ammSwaps
+                prices, usersOrders, signatures, intermediateTxs
             );
 
             // Optionally show balances

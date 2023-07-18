@@ -24,6 +24,12 @@ export interface UniV2Swap {
     sellAmount: bigint;
 }
 
+export interface Transaction{
+    _contract: string;
+    data: string;
+}
+
+
 export interface Surplus {
     token: string;
     amount: bigint;
