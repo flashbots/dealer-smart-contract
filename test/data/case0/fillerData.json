@@ -1,0 +1,18 @@
+{
+    "transferFromInfoArray": [
+        {
+            "to": "dealer",
+            "amount": "10"
+        }
+    ],
+    "transactions": [
+        {
+            "_contract": "uniswapV2Router02",
+            "data": "[\"swapExactTokensForTokens\", [10, 0, [\"0xe7f1725e7734ce288f8367e1bb143e90bb3f0512\", \"0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0\"], \"0x5FbDB2315678afecb367f032d93F642f64180aa3\", 1000000000000]]"
+        },
+        {
+            "_contract": "tokenB",
+            "data": "[\"transfer\", [\"0x70997970C51812dc3A010C7d01b50e0d17dc79C8\", 15]]"
+        }
+    ]
+}

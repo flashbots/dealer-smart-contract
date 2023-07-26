@@ -1,0 +1,11 @@
+[
+    {
+        "allowedTokens": ["A"], 
+        "inequalities": {
+            "tokensAddresses": ["A", "B"],
+            "coefficients": [[1, 0, 0, 0], [0, 0, 1, 0]],
+            "independentCoef": [4990, 16]
+        },
+        "conditions": []
+    }
+]

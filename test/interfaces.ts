@@ -1,15 +1,18 @@
-export interface LimitOrder {
-    nonce: bigint;  
-    sellToken: string;
-    buyToken: string;
-    amounts: bigint[];
+export interface Order {
+    allowedTokens: string[];
+    inequalities: Inequalities;
+    conditions: Transaction[];
 }
 
-export interface OfferCurve {
-    nonce: bigint; // or round
-    sellTok0: boolean;
-    prices: bigint[];
-    amounts: bigint[];
+export interface Inequalities{
+    tokensAddresses: string[];
+    coefficients: BigInt[][];
+    independentCoef: BigInt[];
+}
+
+export interface TransferFromInfo {
+    to: string; 
+    amount: bigint;
 }
 
 export interface SignStruc {
@@ -27,12 +30,6 @@ export interface UniV2Swap {
 export interface Transaction{
     _contract: string;
     data: string;
-}
-
-
-export interface Surplus {
-    token: string;
-    amount: bigint;
 }
 
 export interface Dict {
