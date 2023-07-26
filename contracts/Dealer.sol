@@ -4,6 +4,7 @@ pragma solidity ^0.8.9;
 import "hardhat/console.sol";
 import '@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol';
 import '@openzeppelin/contracts/interfaces/IERC20.sol';
+import "@openzeppelin/contracts/utils/Strings.sol";
 
 contract Dealer {
 
@@ -43,18 +44,23 @@ contract Dealer {
 
     // can we save gas by changing some "memory" to "calldata"?
     function fillOrders (
-        Order[] memory orders, 
-        SignStruc[] memory signatures,
-        TransferFromInfo[][] memory transfersFromInfo,
-        Transaction[] memory transactions
+        Order[] memory orders,  // if orders are calldata it takes more gas
+        SignStruc[] calldata signatures,
+        TransferFromInfo[][] calldata transfersFromInfo,
+        Transaction[] calldata transactions
     ) external {
         uint n = orders.length;
 
         // verify signatures and retrieve users' addresses
         address[] memory users = verifySignatures(orders, signatures, n);
 
-        // move funds from users and record previous balances
+        // record previous balances
         uint[][] memory previousBalances = new uint[][](n);
+        for (uint i = 0; i < n; i++) {
+            previousBalances[i] = getBalances(users[i], orders[i].inequalities.tokensAddresses);
+        }
+
+        // move funds from users
         for (uint i = 0; i < n; i++) {
             Order memory order = orders[i];
             for (uint j = 0; j < order.allowedTokens.length; j++) {
@@ -63,7 +69,6 @@ contract Dealer {
                 IERC20 token = IERC20(bytesToAddress(order.allowedTokens[j]));
                 token.transferFrom(users[i], bytesToAddress(transferFromInfo.to), transferFromInfo.amount);
             }
-            previousBalances[i] = getBalances(users[i], order.inequalities.tokensAddresses);
         }
 
         // call arbitrary transactions
@@ -104,17 +109,19 @@ contract Dealer {
         SignStruc[] memory signatures,
         uint n
     ) private pure returns (address[] memory){
+unchecked{
         address[] memory users = new address[](n);
         for (uint i = 0; i < n; i++) {
             Order memory order = orders[i];
             SignStruc memory signature = signatures[i];
             bytes memory orderBytes = abi.encode(order.allowedTokens, order.inequalities, order.conditions);
-            bytes32 orderHash = keccak256(orderBytes); // am I doing here an unnecesary extra step?
+            bytes32 orderHash = keccak256(orderBytes); // is this doing an unnecesary extra step?
             bytes32 prefixedMessage = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", orderHash));
             address user = ecrecover(prefixedMessage, signature.v, signature.r, signature.s);
             users[i] = user; // is this verification enough?
         }
         return users;
+}
     }
 
     function bytesToAddress(bytes memory bys) private pure returns (address addr) {
@@ -135,14 +142,19 @@ contract Dealer {
         int[][] memory coefficients, // we use a matrix to check many inequalities
         int[] memory independentCoef
     ) private pure {
-        for (uint i; i < independentCoef.length; i++) {
-            int total = 0;
-            for (uint j; 2 * j < coefficients[i].length; j++) {
-                total += coefficients[i][2 * j] * int(balances[j]); // check security of this
-                total += coefficients[i][2 * j + 1] * int(previousBalances[j]);
-            }
-            require(total >= independentCoef[i], 'balance inequality not satisfied');
-        }       
+        // "unchecked" here saves considerable gas
+        // however a verification on the size of coefficients must be done
+        // in order to avoid an overflow attack from the filler
+        unchecked{
+                for (uint i = 0; i < independentCoef.length; i++) {
+                    int total = 0;
+                    for (uint j = 0; 2 * j < coefficients[i].length; j++) {
+                        total += coefficients[i][2 * j] * int(balances[j]);
+                        total += coefficients[i][2 * j + 1] * int(previousBalances[j]);
+                    }
+                    require(total >= independentCoef[i], 'balance inequality not satisfied');
+                } 
+        }
     }
 
     function getBalances(

@@ -1,9 +1,9 @@
 {
-    "transferFromInfoArray": [
-        {
+    "transfersFromInfo": [
+        [{
             "to": "dealer",
             "amount": "10"
-        }
+        }]
     ],
     "transactions": [
         {

@@ -167,19 +167,20 @@ export function encodeOrders(orders: Order[]): string[] {
 }
 
 
-export function getFillerInput(fillerDataString: string, usersDict: Dict)
-: [transferFromInfo: TransferFromInfo[], transactions: Transaction[]] {
-        const fillerData = JSON.parse(fillerDataString) as 
+export function getFillerInput(fillerInputString: string, usersDict: Dict)
+: [transferFromInfo: TransferFromInfo[][], transactions: Transaction[]] {
+        const fillerInput = JSON.parse(fillerInputString) as 
             {
-                transferFromInfoArray: TransferFromInfo[],
+                transfersFromInfo: TransferFromInfo[][],
                 transactions: Transaction[]
             };
-        let transfersFromInfo = fillerData.transferFromInfoArray;
-        transfersFromInfo.map((info) => {
-            info.to = usersDict[info.to]; 
-            return info; 
-        });
-        return [transfersFromInfo, fillerData.transactions];
+        let transfersFromInfo = fillerInput.transfersFromInfo;
+        for (let i = 0; i < transfersFromInfo.length; i++) {
+            for (let j = 0; j < transfersFromInfo[i].length; j++) {
+                transfersFromInfo[i][j].to = usersDict[transfersFromInfo[i][j].to];
+            }
+        }
+        return [transfersFromInfo, fillerInput.transactions];
 }
 
 function toTokAddresses(tokens: string[], tokensDict: Dict): string[] {
