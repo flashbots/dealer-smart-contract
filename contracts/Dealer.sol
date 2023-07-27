@@ -42,7 +42,7 @@ contract Dealer {
         uint256 amount;
     }
 
-    // can we save gas by changing some "memory" to "calldata"?
+    // expiration feature is mandatory but not implemented yet
     function fillOrders (
         Order[] memory orders,  // if orders are calldata it takes more gas
         SignStruc[] calldata signatures,
@@ -54,7 +54,7 @@ contract Dealer {
         // verify signatures and retrieve users' addresses
         address[] memory users = verifySignatures(orders, signatures, n);
 
-        // record previous balances
+        // record balances before execution
         uint[][] memory previousBalances = new uint[][](n);
         for (uint i = 0; i < n; i++) {
             previousBalances[i] = getBalances(users[i], orders[i].inequalities.tokensAddresses);
