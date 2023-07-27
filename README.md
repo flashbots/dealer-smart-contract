@@ -1,4 +1,4 @@
-# WalruSwap - Dealer contract
+# Dealer smart contract
 
 This repository contains "Dealer" smart contract and test cases.
 
