@@ -80,7 +80,7 @@ Currently, a simple swap between two users takes approximately 165K gas. This is
 to a single AMM swap, but the cost is (indirectly) divided among the two users.
 It is possible that the current version can be optimized without design changes.
 
-### Further remarks
+## Further remarks
 
 It is expected that most on-chain trading will soon move to this type of applications implementing the so-called account abstraction. Optimal designs are still to be discovered. The Dealer contract aims to propose new features that seem important 
 enough to be adopted.
