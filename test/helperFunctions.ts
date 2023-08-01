@@ -85,19 +85,12 @@ export function readBalancesFromFile(fileName: string) : string[] {
 }
 
 export function buildOrders(data: any, tokensDict: Dict): Order[] {
-    const ordersFromFile = JSON.parse(data) as Order[];
-    const orders: Order[] = [];
-    for (const orderFromFile of ordersFromFile) {
-        const allowedTokens = toTokAddresses(orderFromFile.allowedTokens, tokensDict)
-        const tokensAddresses = toTokAddresses(orderFromFile.inequalities.tokensAddresses, tokensDict);
-        let inequalities = orderFromFile.inequalities;
-        inequalities.tokensAddresses = tokensAddresses;
-        const order: Order = {
-            allowedTokens: allowedTokens,
-            inequalities: inequalities,
-            conditions: orderFromFile.conditions
-        };
-        orders.push(order);
+    const orders = JSON.parse(data) as Order[];
+    for (const order of orders) {
+        const allowedTokens = toTokAddresses(order.allowedTokens, tokensDict)
+        const tokensAddresses = toTokAddresses(order.inequalities.tokensAddresses, tokensDict);
+        order.allowedTokens = allowedTokens;
+        order.inequalities.tokensAddresses = tokensAddresses;
     }
     return orders;
 }
@@ -111,9 +104,10 @@ export function encodeOrders(orders: Order[]): string[] {
             [
                 "address[]", 
                 "tuple(address[] tokensAddresses, int[][] coefficients, int[] independentCoef)",
-                "tuple(bytes _contract, bytes data)[]"
+                "tuple(address _contract, bytes data)[]",
+                "uint"
             ], 
-            [order.allowedTokens, order.inequalities, order.conditions]
+            [order.allowedTokens, order.inequalities, order.conditions, order.expirationBlock]
         );
         messages.push(msg);
     }

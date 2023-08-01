@@ -64,8 +64,7 @@ as follows:
 (a) Since every call to a different contract is expensive, Dealer contract
 makes everything it can by itself.
 
-(a1) After the initial transfers from users, the filler is allowed to directly execute any other smart contract function directly, except for functions named transferFrom and burnFrom (otherwise the filler could simply steal the user's funds). The archetypical example for this step is an AMM swap. In case the filler wants to call several AMM swaps,
-it can do so directly instead of having to set up an intermediary custom filler contract that calls the swaps at a later step.
+(a1) After the initial transfers, the filler is allowed to execute any other smart contract function directly, except for functions named transferFrom and burnFrom (otherwise the filler could simply steal the users' funds). The archetypical example for this step is one or several AMM swaps and subsequent transfers to fulfill the orders' conditions. The filler can call these functions directly instead of having to set up an intermediary custom filler contract that calls them at a later step.
 
 (a2) Dealer contract calls transferFrom directly in order to avoid an extra
 call to another contract like permit2. The claim here is that the advantages of using permit2 contract might be outweighted by the extra cost that has to be paid at every trade.
@@ -74,12 +73,10 @@ call to another contract like permit2. The claim here is that the advantages of 
 filler at will. This feature allows to reduce the total number of token transfers
 in some cases. In the simplest meaningful case, only two transfers will happen between two users. This case may happen frequently so it is an important case. In more complex cases, with more than two orders, it is also possible to save gas by carefully choosing the recipients of the initial transfers. This feature is not available in UniswapX.
 
-Our intention with the Dealer contract is to obtain the most efficient possible contract without losing functionality.
-We tested the case of a simple swap between two users. There are two subcases:
-when one of the users is the filler, this takes approximately 110K gas (compare
-with 140K in UniswapX). If none of the users is the filler, it takes approximately 140K.
+One goal of the Dealer contract is to be the most efficient possible contract without losing functionality. We tested the case of a simple swap between two users. There are two subcases: when one of the users is the filler, this takes approximately 105K gas (compare with 140K in UniswapX). 
+If none of the users is the filler, it takes approximately 137K.
 In UniswapX, this operation is expected to be considerably more expensive, since it cannot
-be executed by only two swaps. The cost 140K is lower than a single AMM swap, and it is (indirectly) divided among the two users. It is possible that the current version can be optimized without design changes.
+be executed by only two transfers. The cost 137K is lower than a single AMM swap, and it is (indirectly) divided among the two users. It is possible that the current version can be optimized.
 
 ## Further remarks
 

@@ -6,6 +6,7 @@
             "coefficients": [[1, 0, 0, 0], [0, 0, 1, 0]],
             "independentCoef": [9990, 16]
         },
-        "conditions": []
+        "conditions": [],
+        "expirationBlock": 1000000000000
     }
 ]

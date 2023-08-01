@@ -14,6 +14,7 @@ contract Dealer {
         address[] allowedTokens;
         Inequalities inequalities;
         Transaction[] conditions;
+        uint256 expirationBlock;
     }
 
     struct Inequalities {
@@ -44,7 +45,6 @@ contract Dealer {
         uint256 amount;
     }
 
-    // expiration feature is mandatory but not implemented yet
     function fillOrders (
         Order[] memory orders,  // if orders are calldata it takes more gas
         SignStruc[] calldata signatures,
@@ -93,6 +93,8 @@ contract Dealer {
         // To improve efficiency we can implement in this contract the most common conditions
         for (uint i = 0; i < n; i++) {
             Order memory order = orders[i];
+            // check expiration block
+            require(block.number <= order.expirationBlock, 'order has expired');
             // check inequalities
             checkInequalities(
                 getBalances(users[i], order.inequalities.tokensAddresses),
@@ -119,7 +121,12 @@ contract Dealer {
             for (uint i = 0; i < n; i++) {
                 Order memory order = orders[i];
                 SignStruc memory signature = signatures[i];
-                bytes memory orderBytes = abi.encode(order.allowedTokens, order.inequalities, order.conditions);
+                bytes memory orderBytes = abi.encode(
+                    order.allowedTokens,
+                    order.inequalities,
+                    order.conditions,
+                    order.expirationBlock
+                );
                 bytes32 orderHash = keccak256(orderBytes); // is this doing an unnecesary extra step?
                 bytes32 prefixedMessage = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", orderHash));
                 address user = ecrecover(prefixedMessage, signature.v, signature.r, signature.s);

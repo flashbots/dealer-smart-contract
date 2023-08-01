@@ -6,7 +6,8 @@
             "coefficients": [[1, -1, 2, -2], [-1, 0, 0, 0]],
             "independentCoef": [0, -9980]
         },
-        "conditions": []
+        "conditions": [],
+        "expirationBlock": 1000000000000        
     },
     {
         "allowedTokens": ["B"], 
@@ -15,6 +16,7 @@
             "coefficients": [[-1, 1, -2, 2], [0, 0, -1, 0]],
             "independentCoef": [0, -9990]
         },
-        "conditions": []
+        "conditions": [],
+        "expirationBlock": 1000000000000        
     }
 ]

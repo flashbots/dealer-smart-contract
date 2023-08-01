@@ -2,6 +2,7 @@ export interface Order {
     allowedTokens: string[];
     inequalities: Inequalities;
     conditions: Transaction[];
+    expirationBlock: BigInt;
 }
 
 export interface Inequalities{
