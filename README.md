@@ -74,8 +74,7 @@ call to another contract like permit2. The claim here is that the advantages of 
 filler at will. This feature allows to reduce the total number of token transfers
 in some cases. In the simplest meaningful case, only two transfers will happen between two users. This case may happen frequently so it is an important case. In more complex cases, with more than two orders, it is also possible to save gas by carefully choosing the recipients of the initial transfers. This feature is not available in UniswapX.
 
-The Dealer contract is being built with efficiency as a top priority.
-The goal is to obtain the most efficient possible contract without losing functionality.
+Our intention with the Dealer contract is to obtain the most efficient possible contract without losing functionality.
 We tested the case of a simple swap between two users. There are two subcases:
 when one of the users is the filler, this takes approximately 110K gas (compare
 with 140K in UniswapX). If none of the users is the filler, it takes approximately 140K.

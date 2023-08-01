@@ -109,8 +109,8 @@ export function encodeOrders(orders: Order[]): string[] {
         // is it possible to directly encode 'order'?
         const msg = abiCoder.encode(
             [
-                "bytes[]", 
-                "tuple(bytes[] tokensAddresses, int[][] coefficients, int[] independentCoef)",
+                "address[]", 
+                "tuple(address[] tokensAddresses, int[][] coefficients, int[] independentCoef)",
                 "tuple(bytes _contract, bytes data)[]"
             ], 
             [order.allowedTokens, order.inequalities, order.conditions]

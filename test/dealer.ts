@@ -15,16 +15,16 @@ describe("dealer tests", async function () {
         it("case " + i, async function () {
             // set up users
             const [user0, user1, user2, filler] = await ethers.getSigners();
-            let usersDict: Dict = {};
-            // maybe this can be done in the for loop below
-            usersDict['user1'] = user1.getAddress();
-            usersDict['user2'] = user2.getAddress();
-            usersDict['filler'] = filler.getAddress();
 
             // set up Dealer contract
             const Dealer = await ethers.getContractFactory("Dealer");
             const dealer = await Dealer.deploy();
             const dealerAddr = await dealer.getAddress();
+
+            let usersDict: Dict = {};
+            usersDict['user1'] = user1.getAddress();
+            usersDict['user2'] = user2.getAddress();
+            usersDict['filler'] = filler.getAddress();
             usersDict['dealer'] = dealerAddr;
 
             // set up tokens

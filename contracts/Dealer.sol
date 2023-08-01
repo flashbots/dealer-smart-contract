@@ -11,13 +11,13 @@ contract Dealer {
     uint256 MAXIMUM = 2 ** 112; // is this a good choice?
 
     struct Order {
-        bytes[] allowedTokens;
+        address[] allowedTokens;
         Inequalities inequalities;
         Transaction[] conditions;
     }
 
     struct Inequalities {
-        bytes[] tokensAddresses;
+        address[] tokensAddresses;
         int[][] coefficients;
         int[] independentCoef;
     }
@@ -29,18 +29,18 @@ contract Dealer {
     }
 
     struct Transaction{
-        bytes _contract;
+        address _contract;
         bytes data;
     }
 
     struct TransferFromUser{
-        bytes to; 
+        address to; 
         uint256 amount;
     }
 
     struct TransferFromFiller{
-        bytes tokenAddress;
-        bytes to; 
+        address tokenAddress;
+        address to; 
         uint256 amount;
     }
 
@@ -69,20 +69,20 @@ contract Dealer {
             for (uint j = 0; j < order.allowedTokens.length; j++) {
                 TransferFromUser memory transferFromUser = transfersFromUsers[i][j];
                 if (transferFromUser.amount == 0) continue;
-                IERC20 token = IERC20(bytesToAddress(order.allowedTokens[j]));
-                token.transferFrom(users[i], bytesToAddress(transferFromUser.to), transferFromUser.amount);
+                IERC20 token = IERC20(order.allowedTokens[j]);
+                token.transferFrom(users[i], transferFromUser.to, transferFromUser.amount);
             }
         }
         // transfers from filler
         for (uint i = 0; i < transfersFromFiller.length; i++) {
             TransferFromFiller memory transferFromFiller = transfersFromFiller[i];
-            IERC20 token = IERC20(bytesToAddress(transferFromFiller.tokenAddress));
-            token.transferFrom(msg.sender, bytesToAddress(transferFromFiller.to), transferFromFiller.amount);
+            IERC20 token = IERC20(transferFromFiller.tokenAddress);
+            token.transferFrom(msg.sender, transferFromFiller.to, transferFromFiller.amount);
         }
 
         // call arbitrary transactions
         for (uint i = 0; i < transactions.length; i++) {
-            address smartContract = bytesToAddress(transactions[i]._contract);
+            address smartContract = transactions[i]._contract;
             bytes memory data = transactions[i].data;
             // require that the function's name is not "transferFrom" or "burnFrom"
             bytes4 funcSelector = bytes4(data[0]) | bytes4(data[1]) >> 8 | bytes4(data[2]) >> 16 | bytes4(data[3]) >> 24;
@@ -103,11 +103,8 @@ contract Dealer {
             // check conditions
             for (uint j = 0; j < order.conditions.length; j++) {
                 Transaction memory condition = order.conditions[j];
-                if (condition._contract.length == 1) {
-                } else {
-                    address smartContract = bytesToAddress(condition._contract);
-                    smartContract.call(condition.data);
-                }
+                address smartContract = condition._contract;
+                smartContract.call(condition.data);
             }
         }
     }
@@ -117,26 +114,20 @@ contract Dealer {
         SignStruc[] memory signatures,
         uint n
     ) private pure returns (address[] memory){
-unchecked{
-        address[] memory users = new address[](n);
-        for (uint i = 0; i < n; i++) {
-            Order memory order = orders[i];
-            SignStruc memory signature = signatures[i];
-            bytes memory orderBytes = abi.encode(order.allowedTokens, order.inequalities, order.conditions);
-            bytes32 orderHash = keccak256(orderBytes); // is this doing an unnecesary extra step?
-            bytes32 prefixedMessage = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", orderHash));
-            address user = ecrecover(prefixedMessage, signature.v, signature.r, signature.s);
-            users[i] = user; // is this verification enough?
+        unchecked{
+            address[] memory users = new address[](n);
+            for (uint i = 0; i < n; i++) {
+                Order memory order = orders[i];
+                SignStruc memory signature = signatures[i];
+                bytes memory orderBytes = abi.encode(order.allowedTokens, order.inequalities, order.conditions);
+                bytes32 orderHash = keccak256(orderBytes); // is this doing an unnecesary extra step?
+                bytes32 prefixedMessage = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", orderHash));
+                address user = ecrecover(prefixedMessage, signature.v, signature.r, signature.s);
+                users[i] = user; // is this verification enough?
+            }
+            return users;
         }
-        return users;
-}
     }
-
-    function bytesToAddress(bytes memory bys) private pure returns (address addr) {
-        assembly {
-            addr := mload(add(bys,20))
-        } 
-    }   
 
     // This has to be called to grant permissions to other contracts over this one
     function approveToken(address tokenAddress, address spender) public{
@@ -163,18 +154,13 @@ unchecked{
 
     function getBalances(
         address user,
-        bytes[] memory tokensAddresses
+        address[] memory tokensAddresses
     ) private view returns(uint[] memory) {
         uint[] memory balances = new uint[](tokensAddresses.length);
         for (uint j = 0; j < tokensAddresses.length; j++) {
-            IERC20 token = IERC20(bytesToAddress(tokensAddresses[j]));
+            IERC20 token = IERC20(tokensAddresses[j]);
             balances[j] = token.balanceOf(user);
         }
         return balances;
     }
 }
-
-// is it possible and convenient to use the type address instead of bytes
-// for addresses? It could save gas and simplify code by avoiding to 
-// run bytesToAddress many times.
-// can we include ETH transfers?
