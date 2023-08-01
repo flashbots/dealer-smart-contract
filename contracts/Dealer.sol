@@ -1,10 +1,7 @@
 //SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.21;
 
-import "hardhat/console.sol";
-import '@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol';
 import '@openzeppelin/contracts/interfaces/IERC20.sol';
-import "@openzeppelin/contracts/utils/Strings.sol";
 
 contract Dealer {
 
@@ -70,6 +67,8 @@ contract Dealer {
                 token.transferFrom(users[i], bytesToAddress(transferFromInfo.to), transferFromInfo.amount);
             }
         }
+        // To do: allow transfers from msg.sender without corresponding orders
+        // Use the last entries of transferFrom.
 
         // call arbitrary transactions
         for (uint i = 0; i < transactions.length; i++) {

@@ -72,13 +72,15 @@ call to another contract like permit2. The claim here is that the advantages of 
 
 (b) The recipient of the initial transfers from users can be specified by the
 filler at will. This feature allows to reduce the total number of token transfers
-in some cases. In the simplest meaningful case, only two transfers will happen between two users. This case may happen frequently (think of the filler as one of the users, though this is not the only possibility) so it is an important case. In more complex cases, with more than two orders, it is also possible to save gas by carefully choosing the recipients of the initial transfers. This feature is not available in UniswapX.
+in some cases. In the simplest meaningful case, only two transfers will happen between two users. This case may happen frequently so it is an important case. In more complex cases, with more than two orders, it is also possible to save gas by carefully choosing the recipients of the initial transfers. This feature is not available in UniswapX.
 
 The Dealer contract is being built with efficiency as a top priority.
 The goal is to obtain the most efficient possible contract without losing functionality.
-Currently, a simple swap between two users takes approximately 165K gas. This is similar
-to a single AMM swap, but the cost is (indirectly) divided among the two users.
-It is possible that the current version can be optimized without design changes.
+We tested the case of a simple swap between two users. There are two subcases:
+when one of the users is the filler, this takes approximately 125K gas (compare
+with 140K in UniswapX). If none of the users is the filler, it takes approximately 140K.
+In UniswapX, this operation is expected to be considerably more expensive, since it cannot
+be executed by only two swaps. The cost 140K is lower than a single AMM swap, and it is (indirectly) divided among the two users. It is possible that the current version can be optimized without design changes.
 
 ## Further remarks
 
