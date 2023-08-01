@@ -15,6 +15,12 @@ export interface TransferFromInfo {
     amount: bigint;
 }
 
+export interface TransferFromFiller {
+    tokenAddress: string;
+    to: string; 
+    amount: bigint;
+}
+
 export interface SignStruc {
     v: string;
     r: string;

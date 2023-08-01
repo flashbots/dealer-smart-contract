@@ -1,8 +1,7 @@
 import { ethers } from "hardhat"; 
 import Web3, { Address } from "web3";
 import * as fs from 'fs';
-import { tokensDict } from "./constants";
-import { Order, SignStruc, UniV2Swap, Dict, Transaction, TransferFromInfo } from "./interfaces";
+import { Order, SignStruc, Dict, Transaction, TransferFromInfo as TransferFromUser, TransferFromFiller } from "./interfaces";
 
 export function signMessages(privateKeys: string[], messages: string[]): SignStruc[] {
     const signatures: SignStruc[] = [];
@@ -85,49 +84,6 @@ export function readBalancesFromFile(fileName: string) : string[] {
     return lines;
 }
 
-// bigint does not support fractional numbers
-// toBigInt manipulates the string to convert it to the integer part
-// of num * (10 ** decimals)
-function toBigInt(num: string, decimals: number): any {
-    // this assumes that num has correct format
-    num.trim();
-    if (num.indexOf('.') == -1) num = num + '.';
-    const integerMantissa: string[] = num.split('.');
-    const integer = integerMantissa[0];
-    // does substring here work as expected?
-    const mantissa = integerMantissa[1].substring(0, decimals).padEnd(decimals, '0');
-    const resultString = integer + mantissa;
-    return BigInt(resultString);
-}
-
-export function encodeCustomTransactions(
-    conditions: Transaction[],
-    tokensDict: Dict   
-): Transaction[] {
-    const abiCoder = new ethers.AbiCoder();
-    const transactions: Transaction[] = conditions.map(
-        (condition) => {
-            if (condition._contract = "0x00") {
-                const dataArray = JSON.parse(condition.data as string);
-                const tokensAddresses: string[] = dataArray[0].map((name: string) => tokensDict[name]);
-                const coefficients: bigint[][] = dataArray[1];
-                const independentCoef: bigint[] = dataArray[2];
-                const data = abiCoder.encode(["bytes[]", "int[][]", "int[]"],
-                    [tokensAddresses, coefficients, independentCoef]
-                )
-                const transaction: Transaction = {
-                    _contract: condition._contract as string,
-                    data: data
-                }
-                return transaction
-            } else {
-                return condition;
-            }
-        }
-    )
-    return transactions;
-}
-
 export function buildOrders(data: any, tokensDict: Dict): Order[] {
     const ordersFromFile = JSON.parse(data) as Order[];
     const orders: Order[] = [];
@@ -136,12 +92,10 @@ export function buildOrders(data: any, tokensDict: Dict): Order[] {
         const tokensAddresses = toTokAddresses(orderFromFile.inequalities.tokensAddresses, tokensDict);
         let inequalities = orderFromFile.inequalities;
         inequalities.tokensAddresses = tokensAddresses;
-        const conditions: Transaction[] = 
-            encodeCustomTransactions(orderFromFile.conditions, tokensDict);
         const order: Order = {
             allowedTokens: allowedTokens,
             inequalities: inequalities,
-            conditions: conditions
+            conditions: orderFromFile.conditions
         };
         orders.push(order);
     }
@@ -167,20 +121,30 @@ export function encodeOrders(orders: Order[]): string[] {
 }
 
 
-export function getFillerInput(fillerInputString: string, usersDict: Dict)
-: [transferFromInfo: TransferFromInfo[][], transactions: Transaction[]] {
+export function getFillerInput(fillerInputString: string, usersDict: Dict, tokensDict: Dict)
+: [
+    transferFromUsers: TransferFromUser[][],
+    transfersFromFiller: TransferFromFiller[],
+    transactions: Transaction[]
+] {
         const fillerInput = JSON.parse(fillerInputString) as 
             {
-                transfersFromInfo: TransferFromInfo[][],
+                transfersFromUsers: TransferFromUser[][],
+                transfersFromFiller: TransferFromFiller[],
                 transactions: Transaction[]
             };
-        let transfersFromInfo = fillerInput.transfersFromInfo;
-        for (let i = 0; i < transfersFromInfo.length; i++) {
-            for (let j = 0; j < transfersFromInfo[i].length; j++) {
-                transfersFromInfo[i][j].to = usersDict[transfersFromInfo[i][j].to];
+        let transfersFromUsers = fillerInput.transfersFromUsers;
+        for (let i = 0; i < transfersFromUsers.length; i++) {
+            for (let j = 0; j < transfersFromUsers[i].length; j++) {
+                transfersFromUsers[i][j].to = usersDict[transfersFromUsers[i][j].to];
             }
         }
-        return [transfersFromInfo, fillerInput.transactions];
+        let transfersFromFiller = fillerInput.transfersFromFiller;
+        for (let i = 0; i < transfersFromFiller.length; i++) {
+            transfersFromFiller[i].tokenAddress = tokensDict[transfersFromFiller[i].tokenAddress];
+            transfersFromFiller[i].to = usersDict[transfersFromFiller[i].to];
+        }
+        return [transfersFromUsers, transfersFromFiller, fillerInput.transactions];
 }
 
 function toTokAddresses(tokens: string[], tokensDict: Dict): string[] {

@@ -1,14 +1,16 @@
 {
     "transfersFromUsers": [
         [{
-            "to": "user2",
+            "to": "filler",
             "amount": "20"
-        }],
-        [{
-            "to": "user1",
-            "amount": "10"
         }]
     ],
-    "transfersFromFiller": [],
+    "transfersFromFiller": [
+        {
+            "tokenAddress": "B",
+            "to": "user1",
+            "amount": "10"
+        }
+    ],
     "transactions": []
 }

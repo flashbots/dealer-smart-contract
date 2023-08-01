@@ -14,9 +14,9 @@ The flow of the main function, "fillOrders" can be summarized as follows.
 
 (1) Verify signatures and retrieve users' addresses.
 
-(2) Record balances before execution
+(2) Record balances before execution.
 
-(3) Move funds from users
+(3) Execute transfers from users and transfers from the filler.
 
 (4) Call external transactions specified by the filler. These are arbitrary functions, with the exception of "transferFrom" and "burnFrom".
 
@@ -77,7 +77,7 @@ in some cases. In the simplest meaningful case, only two transfers will happen b
 The Dealer contract is being built with efficiency as a top priority.
 The goal is to obtain the most efficient possible contract without losing functionality.
 We tested the case of a simple swap between two users. There are two subcases:
-when one of the users is the filler, this takes approximately 125K gas (compare
+when one of the users is the filler, this takes approximately 110K gas (compare
 with 140K in UniswapX). If none of the users is the filler, it takes approximately 140K.
 In UniswapX, this operation is expected to be considerably more expensive, since it cannot
 be executed by only two swaps. The cost 140K is lower than a single AMM swap, and it is (indirectly) divided among the two users. It is possible that the current version can be optimized without design changes.

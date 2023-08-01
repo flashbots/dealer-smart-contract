@@ -1,6 +1,6 @@
 // REPORT_GAS=true npx hardhat test --grep dealer
 
-import { ethers } from "hardhat"; 
+import { ethers } from "hardhat";
 import { Token } from "../typechain-types";
 import { MAX, tokensDict, privateKeys } from "./constants";
 import { launchToken, getManyBalances, areEqual, areEqualSq, showBalances, signMessages, buildOrders, encodeOrders, getFillerInput } from "./helperFunctions";
@@ -8,17 +8,18 @@ import { Dict } from "./interfaces";
 import * as fs from 'fs';
 import { assert } from 'chai';
 
-const E18 = BigInt('1000000000000000000');
 const wethAddress = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2';
 
-describe("dealer tests", async function () { 
-    for (let i = 0; i < 2; i++ ) {
-        it("case " + i, async function() {
+describe("dealer tests", async function () {
+    for (let i = 0; i < 3; i++) {
+        it("case " + i, async function () {
             // set up users
-            const [user0, user1, user2, user3] = await ethers.getSigners();
+            const [user0, user1, user2, filler] = await ethers.getSigners();
             let usersDict: Dict = {};
+            // maybe this can be done in the for loop below
             usersDict['user1'] = user1.getAddress();
             usersDict['user2'] = user2.getAddress();
+            usersDict['filler'] = filler.getAddress();
 
             // set up Dealer contract
             const Dealer = await ethers.getContractFactory("Dealer");
@@ -29,17 +30,17 @@ describe("dealer tests", async function () {
             // set up tokens
             const [tokenA, addressA]: [Token, string] = await launchToken('A', 'AAA', MAX);
             const [tokenB, addressB]: [Token, string] = await launchToken('B', 'BBB', MAX);
-            let tokensDict: Dict = {'WETH': wethAddress};
+            let tokensDict: Dict = { 'WETH': wethAddress };
             tokensDict['A'] = addressA;
             tokensDict['B'] = addressB;
-            await tokenA.transfer(user1, 5000);
-            await tokenB.transfer(user2, 8000);
-            await tokenA.transfer(user2, 1); // non-zero balances make the main 
-            await tokenB.transfer(user1, 1); // execution cheaper
-            await tokenA.connect(user1).approve(dealer, MAX);
-            await tokenB.connect(user1).approve(dealer, MAX);
-            await tokenA.connect(user2).approve(dealer, MAX);
-            await tokenB.connect(user2).approve(dealer, MAX);
+            const tokensContracts: Token[] = [tokenA, tokenB];
+            const signers = [user1, user2, filler];
+            for (let tokenContract of tokensContracts) {
+                for (let signer of signers) {
+                    await tokenContract.transfer(signer, 10000);
+                    await tokenContract.connect(signer).approve(dealer, MAX);
+                }
+            }
 
             // Uniswap v2 setup
             const UniswapV2Factory = await ethers.getContractFactory("UniswapV2Factory");
@@ -76,21 +77,22 @@ describe("dealer tests", async function () {
 
             // form data from filler
             const fillerInputString = fs.readFileSync('./test/data/case' + i + '/fillerInput.json', 'utf-8');
-            const [transfersFromInfo, transactions] = getFillerInput(fillerInputString, usersDict);
+            const [transfersFromUsers, transfersFromFiller, transactions] =
+                getFillerInput(fillerInputString, usersDict, tokensDict);
             for (let transaction of transactions) {
-                const txData = JSON.parse(transaction.data);                
+                const txData = JSON.parse(transaction.data);
                 transaction.data = contractsDict[transaction._contract].interface.encodeFunctionData(
                     txData[0], txData[1]
                 );
                 transaction._contract = contractsDict[transaction._contract].getAddress();
             }
 
-            const agentsList = ['user1', 'user2', 'dealer'];
-            const agentsAddresses = [user1.address, user2.address, dealerAddr];
+            const agentsList = ['user1', 'user2', 'filler', 'dealer'];
+            const agentsAddresses = [user1.address, user2.address, filler.address, dealerAddr];
             const tokAddresses = [addressA, addressB];
             console.log('balances before: ');
             await showBalances(agentsList, agentsAddresses, tokAddresses);
-            await dealer.fillOrders(orders, signatures, transfersFromInfo, transactions);
+            await dealer.connect(filler).fillOrders(orders, signatures, transfersFromUsers, transfersFromFiller, transactions);
             console.log('\nbalances after: ');
             await showBalances(agentsList, agentsAddresses, tokAddresses);
         });

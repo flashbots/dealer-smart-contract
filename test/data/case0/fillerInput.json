@@ -1,10 +1,11 @@
 {
-    "transfersFromInfo": [
+    "transfersFromUsers": [
         [{
             "to": "dealer",
             "amount": "10"
         }]
     ],
+    "transfersFromFiller": [],
     "transactions": [
         {
             "_contract": "uniswapV2Router02",

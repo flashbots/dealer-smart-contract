@@ -4,7 +4,7 @@
         "inequalities": {
             "tokensAddresses": ["A", "B"],
             "coefficients": [[1, -1, 2, -2], [-1, 0, 0, 0]],
-            "independentCoef": [0, -4980]
+            "independentCoef": [0, -9980]
         },
         "conditions": []
     },
@@ -13,7 +13,7 @@
         "inequalities": {
             "tokensAddresses": ["A", "B"],
             "coefficients": [[-1, 1, -2, 2], [0, 0, -1, 0]],
-            "independentCoef": [0, -7990]
+            "independentCoef": [0, -9990]
         },
         "conditions": []
     }
