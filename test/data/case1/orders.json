@@ -1,22 +1,14 @@
 [
-    {
-        "allowedTokens": ["A"], 
-        "inequalities": {
-            "tokensAddresses": ["A", "B"],
-            "coefficients": [[1, -1, 2, -2], [-1, 0, 0, 0]],
-            "independentCoef": [0, -9980]
-        },
-        "conditions": [],
-        "expirationBlock": 1000000000000        
-    },
-    {
-        "allowedTokens": ["B"], 
-        "inequalities": {
-            "tokensAddresses": ["A", "B"],
-            "coefficients": [[-1, 1, -2, 2], [0, 0, -1, 0]],
-            "independentCoef": [0, -9990]
-        },
-        "conditions": [],
-        "expirationBlock": 1000000000000        
-    }
+    [
+        {
+            "allowedTokens": ["A"], 
+            "inequalities": {
+                "tokensAddresses": ["A", "B"],
+                "coefficients": [[2, -2, 1, -1], [0, 0, -1, 0]],
+                "independentCoef": [0, -1010000]
+            },
+            "conditions": [],
+            "expirationBlock": 1000
+        }
+    ]
 ]

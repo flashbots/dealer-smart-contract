@@ -1,7 +1,7 @@
 import { ethers } from "hardhat"; 
 import Web3, { Address } from "web3";
 import * as fs from 'fs';
-import { Order, SignStruc, Dict, Transaction, TransferFromInfo as TransferFromUser, TransferFromFiller } from "./interfaces";
+import { Order, SignStruc, Dict, Transaction, TransferFromUser, TransferFromFiller, FillerInput } from "./interfaces";
 
 export function signMessages(privateKeys: string[], messages: string[]): SignStruc[] {
     const signatures: SignStruc[] = [];
@@ -84,8 +84,8 @@ export function readBalancesFromFile(fileName: string) : string[] {
     return lines;
 }
 
-export function buildOrders(data: any, tokensDict: Dict): Order[] {
-    const orders = JSON.parse(data) as Order[];
+export function translateOrders(orders: Order[], tokensDict: Dict): Order[] {
+    // const orders = JSON.parse(data) as Order[];
     for (const order of orders) {
         const allowedTokens = toTokAddresses(order.allowedTokens, tokensDict)
         const tokensAddresses = toTokAddresses(order.inequalities.tokensAddresses, tokensDict);
@@ -115,18 +115,8 @@ export function encodeOrders(orders: Order[]): string[] {
 }
 
 
-export function getFillerInput(fillerInputString: string, usersDict: Dict, tokensDict: Dict)
-: [
-    transferFromUsers: TransferFromUser[][],
-    transfersFromFiller: TransferFromFiller[],
-    transactions: Transaction[]
-] {
-        const fillerInput = JSON.parse(fillerInputString) as 
-            {
-                transfersFromUsers: TransferFromUser[][],
-                transfersFromFiller: TransferFromFiller[],
-                transactions: Transaction[]
-            };
+export function translateFillerInput(fillerInput: FillerInput, usersDict: Dict, tokensDict: Dict)
+: FillerInput {
         let transfersFromUsers = fillerInput.transfersFromUsers;
         for (let i = 0; i < transfersFromUsers.length; i++) {
             for (let j = 0; j < transfersFromUsers[i].length; j++) {
@@ -138,7 +128,7 @@ export function getFillerInput(fillerInputString: string, usersDict: Dict, token
             transfersFromFiller[i].tokenAddress = tokensDict[transfersFromFiller[i].tokenAddress];
             transfersFromFiller[i].to = usersDict[transfersFromFiller[i].to];
         }
-        return [transfersFromUsers, transfersFromFiller, fillerInput.transactions];
+        return fillerInput;
 }
 
 function toTokAddresses(tokens: string[], tokensDict: Dict): string[] {

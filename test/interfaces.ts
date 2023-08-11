@@ -11,7 +11,7 @@ export interface Inequalities{
     independentCoef: BigInt[];
 }
 
-export interface TransferFromInfo {
+export interface TransferFromUser {
     to: string; 
     amount: bigint;
 }
@@ -20,6 +20,12 @@ export interface TransferFromFiller {
     tokenAddress: string;
     to: string; 
     amount: bigint;
+}
+
+export interface FillerInput {
+    transfersFromUsers: TransferFromUser[][];
+    transfersFromFiller: TransferFromFiller[];
+    transactions: Transaction[];
 }
 
 export interface SignStruc {

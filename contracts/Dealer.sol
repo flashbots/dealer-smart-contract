@@ -1,6 +1,9 @@
 //SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.21;
 
+// import '@openzeppelin/contracts/security/ReentrancyGuard.sol';
+import "@openzeppelin/contracts/utils/Strings.sol";
+import "hardhat/console.sol";
 import '@openzeppelin/contracts/interfaces/IERC20.sol';
 
 contract Dealer {
@@ -75,7 +78,7 @@ contract Dealer {
         }
         // transfers from filler
         for (uint i = 0; i < transfersFromFiller.length; i++) {
-            TransferFromFiller memory transferFromFiller = transfersFromFiller[i];
+            TransferFromFiller calldata transferFromFiller = transfersFromFiller[i];
             IERC20 token = IERC20(transferFromFiller.tokenAddress);
             token.transferFrom(msg.sender, transferFromFiller.to, transferFromFiller.amount);
         }
@@ -90,7 +93,6 @@ contract Dealer {
             smartContract.call(data);
         }
         // verify conditions
-        // To improve efficiency we can implement in this contract the most common conditions
         for (uint i = 0; i < n; i++) {
             Order memory order = orders[i];
             // check expiration block
@@ -102,7 +104,7 @@ contract Dealer {
                 order.inequalities.coefficients,
                 order.inequalities.independentCoef
             );
-            // check conditions
+            // check other conditions
             for (uint j = 0; j < order.conditions.length; j++) {
                 Transaction memory condition = order.conditions[j];
                 address smartContract = condition._contract;
@@ -113,7 +115,7 @@ contract Dealer {
 
     function verifySignatures(
         Order[] memory orders,
-        SignStruc[] memory signatures,
+        SignStruc[] calldata signatures,
         uint n
     ) private pure returns (address[] memory){
         unchecked{

@@ -1,12 +1,54 @@
 [
-    {
-        "allowedTokens": ["A"], 
-        "inequalities": {
-            "tokensAddresses": ["A", "B"],
-            "coefficients": [[1, -1, 2, -2], [-1, 0, 0, 0]],
-            "independentCoef": [0, -9980]
+    [
+        {
+            "allowedTokens": ["A"], 
+            "inequalities": {
+                "tokensAddresses": ["A", "B"],
+                "coefficients": [[1989, -1989, 1000, -1000], [0, 0, -1, 0]],
+                "independentCoef": [0, -1159300]
+            },
+            "conditions": [],
+            "expirationBlock": 1000
         },
-        "conditions": [],
-        "expirationBlock": 1000000000000
-    }
+        {
+            "allowedTokens": ["A"], 
+            "inequalities": {
+                "tokensAddresses": ["A", "B"],
+                "coefficients": [[1985, -1985, 1000, -1000], [0, 0, -1, 0]],
+                "independentCoef": [0, -1009950]
+            },
+            "conditions": [],
+            "expirationBlock": 1000
+        },
+        {
+            "allowedTokens": ["A"], 
+            "inequalities": {
+                "tokensAddresses": ["A", "B"],
+                "coefficients": [[1984, -1984, 1000, -1000], [0, 0, -1, 0]],
+                "independentCoef": [0, -1001990]
+            },
+            "conditions": [],
+            "expirationBlock": 1000
+        },
+        {
+            "allowedTokens": ["B"], 
+            "inequalities": {
+                "tokensAddresses": ["A", "B"],
+                "coefficients": [[2, -2, 1, -1], [-1, 0, 0, 0]],
+                "independentCoef": [0, -1055500]
+            },
+            "conditions": [],
+            "expirationBlock": 1000
+        },
+        {
+            "allowedTokens": ["B"], 
+            "inequalities": {
+                "tokensAddresses": ["A", "B"],
+                "coefficients": [[1993, -1993, 1000, -1000], [-1, 0, 0, 0]],
+                "independentCoef": [0, -1021000]
+            },
+            "conditions": [],
+            "expirationBlock": 1000
+        }
+    ]
 ]

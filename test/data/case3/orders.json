@@ -1,0 +1,26 @@
+[
+    [
+        {
+            "allowedTokens": ["B"], 
+            "inequalities": {
+                "tokensAddresses": ["A", "B"],
+                "coefficients": [[2, -2, 1, -1]],
+                "independentCoef": [0]
+            },
+            "conditions": [],
+            "expirationBlock": 1000
+        }
+    ],
+    [
+        {
+            "allowedTokens": ["A"], 
+            "inequalities": {
+                "tokensAddresses": ["A", "B"],
+                "coefficients": [[198, -198, 100, -100]],
+                "independentCoef": [0]
+            },
+            "conditions": [],
+            "expirationBlock": 1000
+        }
+    ]    
+]

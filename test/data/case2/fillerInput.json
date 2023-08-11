@@ -1,16 +1,57 @@
-{
-    "transfersFromUsers": [
-        [{
-            "to": "filler",
-            "amount": "20"
-        }]
-    ],
-    "transfersFromFiller": [
-        {
-            "tokenAddress": "B",
-            "to": "user1",
-            "amount": "10"
-        }
-    ],
-    "transactions": []
-}
+[
+    {
+        "transfersFromUsers": [
+            [{
+                "to": "dealer",
+                "amount": "80000"
+            }],
+            [{
+                "to": "dealer",
+                "amount": "5000"
+            }],
+            [{
+                "to": "dealer",
+                "amount": "1000"
+            }],
+            [{
+                "to": "dealer",
+                "amount": "110542"
+            }],
+            [{
+                "to": "dealer",
+                "amount": "41825"
+            }]        
+        ],
+        "transfersFromFiller": [],
+        "transactions": [
+            {
+                "_contract": "uniswapV2Router02",
+                "data": "[\"swapExactTokensForTokens\", [9500, 0, [\"0xe7f1725e7734ce288f8367e1bb143e90bb3f0512\", \"0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0\"], \"0x5FbDB2315678afecb367f032d93F642f64180aa3\", 1000000000000]]"
+            },
+            {
+                "_contract": "tokenB",
+                "data": "[\"transfer\", [\"0x70997970C51812dc3A010C7d01b50e0d17dc79C8\", 159182]]"
+            },
+            {
+                "_contract": "tokenB",
+                "data": "[\"transfer\", [\"0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC\", 9947]]"
+            },
+            {
+                "_contract": "tokenB",
+                "data": "[\"transfer\", [\"0x90F79bf6EB2c4f870365E785982E1f101E93b906\", 1987]]"
+            },
+            {
+                "_contract": "tokenA",
+                "data": "[\"transfer\", [\"0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65\", 55500]]"
+            },
+            {
+                "_contract": "tokenA",
+                "data": "[\"transfer\", [\"0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc\", 21000]]"
+            },
+            {
+                "_contract": "tokenB",
+                "data": "[\"transfer\", [\"0x976EA74026E726554dB657fA54763abd0C3a0aa9\", 176]]"
+            }
+        ]
+    }
+]

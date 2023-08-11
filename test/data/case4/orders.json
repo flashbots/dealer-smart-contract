@@ -1,0 +1,34 @@
+[
+    [
+        {
+            "allowedTokens": ["A"], 
+            "inequalities": {
+                "tokensAddresses": ["A", "C"],
+                "coefficients": [[3, -3, 1, -1], [0, 0, -1, 0]],
+                "independentCoef": [0, -1003000]
+            },
+            "conditions": [],
+            "expirationBlock": 1000
+        },
+        {
+            "allowedTokens": ["B"], 
+            "inequalities": {
+                "tokensAddresses": ["B", "A"],
+                "coefficients": [[1, -1, 2, -2], [0, 0, -1, 0]],
+                "independentCoef": [0, -1001000]
+            },
+            "conditions": [],
+            "expirationBlock": 1000
+        },
+        {
+            "allowedTokens": ["C"], 
+            "inequalities": {
+                "tokensAddresses": ["C", "B"],
+                "coefficients": [[2000, -2000, 3030, -3030], [0, 0, -1, 0]],
+                "independentCoef": [0, -10002000]
+            },
+            "conditions": [],
+            "expirationBlock": 1000
+        }
+    ]
+]
