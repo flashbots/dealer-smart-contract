@@ -56,7 +56,6 @@ describe("dealer tests", async function () {
             const uniswapV2Factory = await UniswapV2Factory.deploy(user0.address);
             const uniswapV2FactoryAddress = await uniswapV2Factory.getAddress();
             const UniswapV2Router02 = await ethers.getContractFactory("UniswapV2Router02");
-            // not really used in these tests
             const wethAddress = '0x0000000000000000000000000000000000000000'; 
             const uniswapV2Router02 = await UniswapV2Router02.deploy(uniswapV2FactoryAddress, wethAddress);
             const routerAddress = await uniswapV2Router02.getAddress();
