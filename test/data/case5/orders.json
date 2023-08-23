@@ -1,0 +1,14 @@
+[
+    [
+        {
+            "allowedTokens": ["A", "C"], 
+            "inequalities": {
+                "tokensAddresses": ["A", "B", "C"],
+                "coefficients": [[2, -2, 1, -1, 0, 0], [0, 0, -1, 0, 0, 0], [-1, 1, 0, 0, 1000, -1000]],
+                "independentCoef": [0, -1010000, 0]
+            },
+            "conditions": [],
+            "expirationBlock": 1000
+        }
+    ]
+]

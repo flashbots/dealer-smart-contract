@@ -13,7 +13,7 @@ describe("dealer tests", async function () {
         await network.provider.send("hardhat_reset");
     })
 
-    for (let i = 1; i <= 4; i++) {
+    for (let i = 1; i <= 5; i++) {
         it("case " + i, async function () {
             // set up users
             const [user0, user1, user2, user3, user4, user5, filler] = 
@@ -24,6 +24,25 @@ describe("dealer tests", async function () {
             const dealer = await Dealer.deploy();
             const dealerAddr = await dealer.getAddress();
 
+            // set up tokens
+            const [tokenA, addressA]: [Token, string] = await launchToken('A', 'AAA', MAX);
+            const [tokenB, addressB]: [Token, string] = await launchToken('B', 'BBB', MAX);
+            const [tokenC, addressC]: [Token, string] = await launchToken('C', 'CCC', MAX);
+
+            const tokensContracts: Token[] = [tokenA, tokenB, tokenC];
+            const signers = [user1, user2, user3, user4, user5, filler];
+            for (let tokenContract of tokensContracts) {
+                for (let signer of signers) {
+                    await tokenContract.transfer(signer, 1000000);
+                    await tokenContract.connect(signer).approve(dealer, MAX);
+                }
+            }
+
+            // build auxiliary dictionaries
+            let tokensDict: Dict = {};
+            tokensDict['A'] = addressA;
+            tokensDict['B'] = addressB;
+            tokensDict['C'] = addressC;
             let usersDict: Dict = {};
             usersDict['user1'] = user1.getAddress();
             usersDict['user2'] = user2.getAddress();
@@ -32,24 +51,6 @@ describe("dealer tests", async function () {
             usersDict['user5'] = user5.getAddress();
             usersDict['filler'] = filler.getAddress();
             usersDict['dealer'] = dealerAddr;
-
-            // set up tokens
-            const [tokenA, addressA]: [Token, string] = await launchToken('A', 'AAA', MAX);
-            const [tokenB, addressB]: [Token, string] = await launchToken('B', 'BBB', MAX);
-            const [tokenC, addressC]: [Token, string] = await launchToken('C', 'CCC', MAX);
-            let tokensDict: Dict = {};
-            tokensDict['A'] = addressA;
-            tokensDict['B'] = addressB;
-            tokensDict['C'] = addressC;
-            const tokensContracts: Token[] = [tokenA, tokenB, tokenC];
-            const signers = [user1, user2, user3, user4, user5, filler];
-            
-            for (let tokenContract of tokensContracts) {
-                for (let signer of signers) {
-                    await tokenContract.transfer(signer, 1000000);
-                    await tokenContract.connect(signer).approve(dealer, MAX);
-                }
-            }
 
             // Uniswap v2 setup
             const UniswapV2Factory = await ethers.getContractFactory("UniswapV2Factory");
