@@ -1,6 +1,6 @@
 # Dealer smart contract
 
-This repository contains "Dealer" smart contract and test cases.
+This repository contains a smart contract called "Dealer" with some test cases.
 Read description and purposes [here](https://www.notion.so/flashbots/New-trends-in-decentralized-exchange-applications-exploring-the-design-space-1674e673732943769c693179d356a23c).
 
 ## Install and run instructions
@@ -17,7 +17,7 @@ npm install
 
 Patch Uniswap v2.
 
-Note: when running the tests, Uniswap may throw an error that can be fixed with this patch. The patched code seems to hurt the intention of the original code but it is good enough for testing the Dealer contract. The original code can be read as commented code at the function pairFor.
+Note: when running the tests, Uniswap may throw an error that can be fixed with this patch. The patched code seems to hurt the intention of the original code but it is good enough for testing the Dealer contract. The original code can be read as commented code at the function pairFor in the patched file.
 
 Replace the file
 ```
