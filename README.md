@@ -1,7 +1,7 @@
 # Dealer smart contract
 
 This repository contains a smart contract called "Dealer" with some test cases.
-Read description and purposes [here](https://www.notion.so/flashbots/New-trends-in-decentralized-exchange-applications-exploring-the-design-space-1674e673732943769c693179d356a23c).
+Read description and purposes [here](https://collective.flashbots.net/t/new-trends-in-decentralized-exchange-applications-exploring-the-design-space/2268).
 
 ## Install and run instructions
 
